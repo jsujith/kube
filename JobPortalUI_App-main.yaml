@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jobportalui
+spec:
+  selector:
+    app: jobportalui
+  ports:
+    - port: 8044
+      targetPort: 8043
+      nodePort: 30007
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobportalui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jobportalui
+  template:
+    metadata:
+      labels:
+        app: jobportalui
+    spec:
+     containers:
+     - name: jobportalui
+       image: jsr9sr/jobportalui_app:1.0.3
+       imagePullPolicy: IfNotPresent
+       volumeMounts:
+       - name: hostpath-volume
+         mountPath: /root/data/jnp_data/
+       - name: hostpath-volume1
+         mountPath: /root/repos/ResumeParser/Resumes/
+     volumes:
+       - name: hostpath-volume
+         hostPath:
+          path: /mnt/nfs_clientshare/jnp_data
+       - name: hostpath-volume1
+         hostPath:
+          path: /mnt/nfs_clientshare/repos
